@@ -1,21 +1,32 @@
 package pf01;
 
 import java.awt.Button;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.awt.Label;
+import java.awt.Panel;
 import java.awt.TextArea;
 import java.awt.TextField;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
  
 public class PF0101 {
 
 	private static final Logger log = LoggerFactory.getLogger(PF0101.class);
+	static Map<String,Object> config;
 	//static final String contentText = "1.)新增切換案鈕方便打包，\n    src←→classes，java←→class。\n\n2.)檔案位址請使用'\\'(左上右下斜線)做區隔。\n\n3.)多檔案位置可使用';'(分號)區隔位置。\n\n4.)若有重複檔案，此程式將自行覆蓋，請小心使用。\n\n5.)檔案母位置：為不打包部分，供檔案複製用。\n\n   例：D:\\project\\TBVD\\TBVD\\moiland-web100\\WebRoot\n\n6.)存檔位置：為檔案打包須存放之位置。\n\n   例：D:\\TBVD\\webapp\n\n7.)檔案位置：為須打包覆部分。\n\n   例：REG\\RAA01\\RAA0101.jsp\n\n8.)於檔案位置點擊Enter鍵可直接輸入。\n\n9.)如須抓取網路上之檔案，請於檔案母位置先行輸入IP\n\n10.)修改為打包時程式大小寫需相同\n\n11.)修改為可點選資料夾抓取以下所有檔案\n";
 	static final String contentText = "操作說明:\n" 
 			+ "–來源路徑: 指定本機檔案來源路徑 \n   D:\\project\\workspace\\web_moi_kcg\n"
@@ -41,13 +52,17 @@ public class PF0101 {
 	static Label lbSaveFile = new Label("目標路徑：");
 	static Label lbSelectFile = new Label("檔案位置：");
 	static Label lbTalbe = new Label("檔案列表：");
+	static Label lbAP = new Label("AP列表：");
 	static Label lbInput = new Label("輸入");
 	static Label lbSwitch = new Label("列表切換");
 	static Label lbOutput = new Label("輸出");
+	static Label lbAPFun = new Label("AP相關");
 	static TextField tfGetFile = new TextField("", 35);
 	static TextField tfSaveFile = new TextField("", 35);
 	static TextField tfSelectFile = new TextField("", 35);
 	static TextField tfHidden = new TextField("", 35);
+	static Checkbox chAPs[];
+	static Panel pnAP;
 	static Button btGetFile = new Button("瀏覽");
 	static Button btSaveFile = new Button("瀏覽");
 	static Button btSelectFile = new Button("瀏覽");
@@ -62,14 +77,14 @@ public class PF0101 {
 	static Button btADWebRoot = new Button("加減WebRoot");
 	static Button btADwebapp = new Button("加減webapp");
 	static Button btOutBat = new Button("匯出Bat檔");
+	static Button btAPFun = new Button("APServer 重啟");
 	static TextArea taMes = new TextArea("", 30, 100);
 	static Label block = new Label("");
 
 	public static void main(String[] args) throws Exception {
-		log.info("=============");
-		log.debug("=============");
-		f1.setLocation(600, 300);
-		f1.setSize(550, 580);
+		config = loadConfig();
+		f1.setLocation(600, 250);
+		f1.setSize(550, 620);
 		f1.setBackground(new Color(220, 220, 255));
 		f1.addWindowListener(new WindowEventHandler());
 		f1.setLayout(new java.awt.GridBagLayout());
@@ -91,9 +106,11 @@ public class PF0101 {
 		btADWebRoot.setBackground(new Color(220, 220, 255));
 		btADwebapp.setBackground(new Color(220, 220, 255));
 		btOutBat.setBackground(new Color(220, 220, 255));
+		btAPFun.setBackground(new Color(220, 220, 255));
 		lbInput.setAlignment(Label.CENTER);
 		lbOutput.setAlignment(Label.CENTER);
 		lbSwitch.setAlignment(Label.CENTER);
+		lbAPFun.setAlignment(Label.CENTER);
 
 		c1.gridx = 0;
 		c1.gridy = 0;
@@ -114,6 +131,60 @@ public class PF0101 {
 		c1.fill = 0;
 		c1.anchor = 17;
 		f1.add(lbGetFile, c1);
+		
+		c1.gridx = 0;
+		c1.gridy = 2;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 0;
+		c1.anchor = 17;
+		f1.add(lbSaveFile, c1);
+		
+		c1.gridx = 0;
+		c1.gridy = 3;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 0;
+		c1.anchor = 17;
+		f1.add(lbSelectFile, c1);
+		
+		c1.gridx = 0;
+		c1.gridy = 5;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 2;
+		c1.anchor = 17;
+		f1.add(lbAP, c1);
+
+		c1.gridx = 0;
+		c1.gridy = 6;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 2;
+		c1.anchor = 17;
+		f1.add(lbTalbe, c1);
+
+		c1.gridx = 0;
+		c1.gridy = 7;
+		c1.gridwidth = 3;
+		c1.gridheight = 14;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 2;
+		c1.anchor = 17;
+		f1.add(taTable, c1);
+
+		
+
+		
 
 		c1.gridx = 1;
 		c1.gridy = 1;
@@ -125,26 +196,6 @@ public class PF0101 {
 		c1.anchor = 17;
 		f1.add(tfGetFile, c1);
 
-		c1.gridx = 3;
-		c1.gridy = 1;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 2;
-		c1.anchor = 17;
-		f1.add(btGetFile, c1);
-
-		c1.gridx = 0;
-		c1.gridy = 2;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 0;
-		c1.anchor = 17;
-		f1.add(lbSaveFile, c1);
-
 		c1.gridx = 1;
 		c1.gridy = 2;
 		c1.gridwidth = 1;
@@ -154,6 +205,48 @@ public class PF0101 {
 		c1.fill = 0;
 		c1.anchor = 17;
 		f1.add(tfSaveFile, c1);
+		
+		c1.gridx = 1;
+		c1.gridy = 3;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 0;
+		c1.anchor = 17;
+		f1.add(tfSelectFile, c1);
+		
+		c1.gridx = 1;
+		c1.gridy = 5;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 0;
+		c1.anchor = 17;
+		pnAP = new Panel(new GridLayout(1, config.size()));
+		int i=0;
+		chAPs = new Checkbox[config.size()];
+		for(Entry<String,Object> ent:config.entrySet()) {
+			chAPs[i] = new Checkbox(ent.getKey());
+			pnAP.add(chAPs[i]);
+			i++;
+		}
+		f1.add(pnAP, c1);
+		
+		
+		
+		
+		
+		c1.gridx = 3;
+		c1.gridy = 1;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 2;
+		c1.anchor = 17;
+		f1.add(btGetFile, c1);
 
 		c1.gridx = 3;
 		c1.gridy = 2;
@@ -165,26 +258,6 @@ public class PF0101 {
 		c1.anchor = 17;
 		f1.add(btSaveFile, c1);
 
-		c1.gridx = 0;
-		c1.gridy = 3;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 0;
-		c1.anchor = 17;
-		f1.add(lbSelectFile, c1);
-
-		c1.gridx = 1;
-		c1.gridy = 3;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 0;
-		c1.anchor = 17;
-		f1.add(tfSelectFile, c1);
-
 		c1.gridx = 3;
 		c1.gridy = 3;
 		c1.gridwidth = 1;
@@ -195,9 +268,16 @@ public class PF0101 {
 		c1.anchor = 17;
 		f1.add(btSelectFile, c1);
 		
+		c1.gridx = 3;
+		c1.gridy = 5;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 2;
+		c1.anchor = 17;
+		f1.add(btAPFun, c1);
 		
-		
-
 		//input function start
 		c1.gridx = 3;
 		c1.gridy = 7;
@@ -271,7 +351,7 @@ public class PF0101 {
 		f1.add(btSwitch, c1);
 
 		c1.gridx = 3;
-		c1.gridy = 15;
+		c1.gridy = 14;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
@@ -281,7 +361,7 @@ public class PF0101 {
 		f1.add(btADWebRoot, c1);
 
 		c1.gridx = 3;
-		c1.gridy = 16;
+		c1.gridy = 15;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
@@ -291,7 +371,7 @@ public class PF0101 {
 		f1.add(btADwebapp, c1);
 
 		c1.gridx = 3;
-		c1.gridy = 17;
+		c1.gridy = 16;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
@@ -301,7 +381,7 @@ public class PF0101 {
 		f1.add(lbOutput, c1);
 		
 		c1.gridx = 3;
-		c1.gridy = 18;
+		c1.gridy = 17;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
@@ -312,7 +392,7 @@ public class PF0101 {
 		
 		
 		c1.gridx = 3;
-		c1.gridy = 19;
+		c1.gridy = 18;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
@@ -324,35 +404,6 @@ public class PF0101 {
 		//function end
 		
 		
-
-		c1.gridx = 0;
-		c1.gridy = 5;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 2;
-		c1.anchor = 17;
-
-		c1.gridx = 0;
-		c1.gridy = 6;
-		c1.gridwidth = 1;
-		c1.gridheight = 1;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 2;
-		c1.anchor = 17;
-		f1.add(lbTalbe, c1);
-
-		c1.gridx = 0;
-		c1.gridy = 7;
-		c1.gridwidth = 3;
-		c1.gridheight = 14;
-		c1.weightx = 0.0D;
-		c1.weighty = 0.0D;
-		c1.fill = 2;
-		c1.anchor = 17;
-		f1.add(taTable, c1);
 
 		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
 			// os是 windows
@@ -390,7 +441,24 @@ public class PF0101 {
 			tfSaveFile.addKeyListener(new SaveKeyinControlInUnixOS());
 		}
 		taTable.addFocusListener(new FocusContol());
+		btAPFun.addActionListener(new APFunControll());
 		f1.setVisible(true);
+	}
+
+	private static Map<String,Object> loadConfig() {
+		Yaml yml = new Yaml();
+		InputStream is = null;
+		File f = null;
+		String[] paths = new String[0];
+		try {
+			is = new FileInputStream(new File("./src/main/resources/config.yml"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		Map<String,Object> map = null;
+		if(is!=null)
+		map = yml.load(is);
+		return map;
 	}
 }
 

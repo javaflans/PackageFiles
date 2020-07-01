@@ -38,6 +38,11 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
     compile group: 'commons-lang', name: 'commons-lang', version: '2.5'
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+	compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+	// https://mvnrepository.com/artifact/com.jcraft.jsch/com.jcraft.jsch
+	compile group: 'com.jcraft.jsch', name: 'com.jcraft.jsch', version: '0.1.37-20081006'
+	
     
 }
 

@@ -50,3 +50,4 @@ WebContent/WEB-INF/classes/
 .gradle/
 build/
 bin/
+lib/
