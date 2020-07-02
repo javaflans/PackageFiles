@@ -8,12 +8,9 @@
 
 
 plugins {
-    id 'java-library'
+    // Apply the java-library plugin to add support for Java Library
+    // id 'java-library'
     id 'application'
-}
-
-application {
-    mainClass = 'pf01.PF0101'
 }
 
 sourceCompatibility = 1.8
@@ -21,7 +18,7 @@ targetCompatibility = 1.8
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api 'org.apache.commons:commons-math3:3.6.1'
+    // api 'org.apache.commons:commons-math3:3.6.1'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:23.0'
@@ -53,20 +50,30 @@ repositories {
     mavenCentral()
 }
 
+configure([compileJava, compileTestJava]) {
+  
+  options.encoding = "CP950"  //如果你要跑在Big5的JAVA環境的話，解開前面的註解
+}
 
-compileJava.options.fork = true
-compileJava.options.forkOptions.executable = 'N:/jdk1.8.0_162/bin/javac'
 
-jar {
-    baseName = 'PackageFiles'
-    //version = '1.1.0'
-    manifest {
-        attributes(
-            'Class-Path': '.',
-            'Main-Class': 'pf01.PF0101'
-        )
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }   
+
+// compileJava.options.fork = true
+// compileJava.options.forkOptions.executable = '/home/morris/programing/java-se-7u75-ri/bin/javac'
+
+// jar {
+//     baseName = 'PackageFiles'
+//     version = '1.1.0'
+//     manifest {
+//         attributes(
+//             'Class-Path': '.',
+//             'Main-Class': 'pf01.PF0101'
+//         )
+//     }
+//     from {
+//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//     }   
+// }
+
+application {
+    mainClass = 'pf01.PF0101'
 }
