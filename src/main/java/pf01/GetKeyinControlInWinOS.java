@@ -17,9 +17,8 @@ import org.apache.commons.lang.StringUtils;
 public class GetKeyinControlInWinOS implements KeyListener {
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 	private long previousKeyReleaseTime = 0L;
-	private long keyReleaseThreshold = 800;
+	private long keyReleaseThreshold = 300;
 	private boolean isScaningFolder = false;
-
 
 	private void doFolderScan(String parentPath, String targetPath) {
 		isScaningFolder = true;
@@ -45,30 +44,30 @@ public class GetKeyinControlInWinOS implements KeyListener {
 					if (cnt == 1) {
 						return target;
 					}
-				}else {
+				} else {
 					return "";
 				}
-			} catch(Exception ex) {
-					log.error("I/O went wrong");
+			} catch (Exception ex) {
+				log.error("I/O went wrong");
 			}
 
 			return "";
 
-	}).whenComplete((target, exception) -> {
-		isScaningFolder = false;
-		EventQueue.invokeLater(()->{
-			log.info("run on which thread? "+ Thread.currentThread().getName());
-			if(!target.equals("")) {
-				PF0101.tfGetFile.setText(parentPath + target + "/");
-				PF0101.tfGetFile.setCaretPosition(PF0101.tfGetFile.getText().length());
-			}
-			if(exception != null) {
-				log.error("I/O went wrong when doing job in for/join thread pool:"+ exception.toString());
-			}
+		}).whenComplete((target, exception) -> {
+			isScaningFolder = false;
+			EventQueue.invokeLater(() -> {
+				log.info("run on which thread? " + Thread.currentThread().getName());
+				if (!target.equals("")) {
+					PF0101.tfGetFile.setText(parentPath + target + "\\");
+					PF0101.tfGetFile.setCaretPosition(PF0101.tfGetFile.getText().length());
+				}
+				if (exception != null) {
+					log.error("I/O went wrong when doing job in for/join thread pool:" + exception.toString());
+				}
+			});
 		});
-	});
 	}
-	
+
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
@@ -112,14 +111,14 @@ public class GetKeyinControlInWinOS implements KeyListener {
 				PF0101.tfGetFile.setCaretPosition(PF0101.tfGetFile.getText().length());
 			}
 		} else if (e.getKeyCode() != 8) {
-			String parentPath = value.substring(0, value.lastIndexOf("/") + 1);
-			String targetPath = value.substring(value.lastIndexOf("/") + 1);
+			String parentPath = value.substring(0, value.lastIndexOf("\\") + 1);
+			String targetPath = value.substring(value.lastIndexOf("\\") + 1);
 
 			long thisTimeMills = System.currentTimeMillis();
 			long diffTimeMill = thisTimeMills - previousKeyReleaseTime;
 			previousKeyReleaseTime = thisTimeMills;
-			
-			if(diffTimeMill > keyReleaseThreshold && !isScaningFolder)	{
+
+			if (diffTimeMill > keyReleaseThreshold && !isScaningFolder) {
 				log.info("do FolderScan");
 				doFolderScan(parentPath, targetPath);
 			}

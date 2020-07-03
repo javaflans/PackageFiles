@@ -1,8 +1,10 @@
 package pf01;
 
+import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -13,6 +15,57 @@ import org.apache.commons.lang.StringUtils;
 //Auto Complete
 public class SaveKeyinControlInWinOS implements KeyListener {
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+	private long previousKeyReleaseTime = 0L;
+	private long keyReleaseThreshold = 300;
+	private boolean isScaningFolder = false;
+	
+	private void doFolderScan(String parentPath, String targetPath) {
+		isScaningFolder = true;
+		CompletableFuture.supplyAsync(() -> {
+			try {
+				File folder = new File(parentPath);
+				if (folder.isDirectory()) {
+					String[] list = folder.list();
+					String target = "";
+					int cnt = 0;
+					for (String p : list) {
+						if ((StringUtils.containsIgnoreCase(p, targetPath)) && new File(parentPath, p).isDirectory()) {
+							if (StringUtils.equalsIgnoreCase(p, targetPath)) {
+								cnt = 1;
+								target = p;
+								break;
+							} else {
+								target = p;
+								cnt++;
+							}
+						}
+					}
+					if (cnt == 1) {
+						return target;
+					}
+				} else {
+					return "";
+				}
+			} catch (Exception ex) {
+				log.error("I/O went wrong");
+			}
+
+			return "";
+
+		}).whenComplete((target, exception) -> {
+			isScaningFolder = false;
+			EventQueue.invokeLater(() -> {
+				log.info("run on which thread? " + Thread.currentThread().getName());
+				if (!target.equals("")) {
+					PF0101.tfSaveFile.setText(parentPath + target + "\\");
+					PF0101.tfSaveFile.setCaretPosition(PF0101.tfSaveFile.getText().length());
+				}
+				if (exception != null) {
+					log.error("I/O went wrong when doing job in for/join thread pool:" + exception.toString());
+				}
+			});
+		});
+	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -59,27 +112,14 @@ public class SaveKeyinControlInWinOS implements KeyListener {
 		} else if (e.getKeyCode() != 8) {
 			String parentPath = value.substring(0, value.lastIndexOf("\\") + 1);
 			String targetPath = value.substring(value.lastIndexOf("\\") + 1);
-			File folder = new File(parentPath);
-			if (folder.isDirectory()) {
-				String[] list = folder.list();
-				String target = "";
-				int cnt = 0;
-				for (String p : list) {
-					if ((StringUtils.containsIgnoreCase(p, targetPath)) && new File(parentPath, p).isDirectory()) {
-						if (StringUtils.equalsIgnoreCase(p, targetPath)) {
-							cnt = 1;
-							target = p;
-							break;
-						} else {
-							target = p;
-							cnt++;
-						}
-					}
-				}
-				if (cnt == 1) {
-					PF0101.tfSaveFile.setText(parentPath + target + "\\");
-					PF0101.tfSaveFile.setCaretPosition(PF0101.tfSaveFile.getText().length());
-				}
+			
+			long thisTimeMills = System.currentTimeMillis();
+			long diffTimeMill = thisTimeMills - previousKeyReleaseTime;
+			previousKeyReleaseTime = thisTimeMills;
+
+			if (diffTimeMill > keyReleaseThreshold && !isScaningFolder) {
+				log.info("do FolderScan");
+				doFolderScan(parentPath, targetPath);
 			}
 		}
 	}
