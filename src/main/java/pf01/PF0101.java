@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -82,7 +83,8 @@ public class PF0101 {
 	static Label block = new Label("");
 
 	public static void main(String[] args) throws Exception {
-		config = loadConfig();
+		Configuration confUtil = new Configuration();
+		config = confUtil.loadConfig();
 		f1.setLocation(600, 250);
 		f1.setSize(550, 620);
 		f1.setBackground(new Color(220, 220, 255));
@@ -445,21 +447,6 @@ public class PF0101 {
 		f1.setVisible(true);
 	}
 
-	private static Map<String,Object> loadConfig() {
-		Yaml yml = new Yaml();
-		InputStream is = null;
-		File f = null;
-		String[] paths = new String[0];
-		try {
-			is = new FileInputStream(new File("./src/main/resources/config.yml"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		Map<String,Object> map = null;
-		if(is!=null)
-		map = yml.load(is);
-		return map;
-	}
 }
 
 /*
