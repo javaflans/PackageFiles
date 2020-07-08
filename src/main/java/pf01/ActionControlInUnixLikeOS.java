@@ -1,5 +1,6 @@
 package pf01;
 
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.channels.FileChannel;
+import java.util.Map;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -199,7 +201,7 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		PF0101.tfSaveFile.setBackground(new Color(255, 255, 255));
 		PF0101.tfSelectFile.setBackground(new Color(255, 255, 255));
 		PF0101.taTable.setBackground(new Color(255, 255, 255));
-		int sucCount=0,errCount=0;
+		int totCount=0,sucCount=0,errCount=0;
 		if (getPath.equals("")) {
 			PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
 			JOptionPane.showMessageDialog(null, "尚未輸入來源路徑", "警告", 2);
@@ -220,11 +222,13 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑，即起始於/home/...", "警告", 2);
 			return;
 		}
+		/*
 		if (!savePath.substring(0, 6).equals("/home/")) {
 			PF0101.tfSaveFile.setBackground(new Color(255, 160, 160));
 			JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑，即起始於/home/...", "警告", 2);
 			return;
 		}
+		*/
 		if (tablePath.substring(1, 2).equals(":")) {
 			PF0101.taTable.setBackground(new Color(255, 160, 160));
 			JOptionPane.showMessageDialog(null, "檔案列表不能為絕對路徑", "警告", 2);
@@ -242,6 +246,34 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		creMes.append("========================\n");
 
 		String[] temp = tablePath.split("\n");
+		if ((!savePath.substring(1, 2).equals("\\"))) {
+			Map<String, Object> config = PF0101.config;
+
+			for (Checkbox chAP : PF0101.chAPs) {
+				if (chAP.getState()) {
+					totCount += temp.length;
+					Map<String, Object> data = (Map<String, Object>) config.get(chAP.getLabel());
+					String newSavePath = "\\\\"+data.get("url").toString()+(savePath.startsWith("\\")?savePath:("\\")+savePath);
+					String[] res = processPackage(temp, getPath, newSavePath, sucMes, creMes, errMes, sucCount, errCount);
+					sucCount = Integer.parseInt(res[0]);
+					errCount = Integer.parseInt(res[1]);
+				}
+			}
+		} else {
+			totCount = temp.length;
+			String[] res = processPackage(temp, getPath, savePath, sucMes, creMes, errMes, sucCount, errCount);
+			sucCount = Integer.parseInt(res[0]);
+			errCount = Integer.parseInt(res[1]);
+		}
+		
+		okMes.append("推送檔案總數: "+temp.length+" 個, 成功推送: "+sucCount+" 個, 推送失敗: "+errCount+" 個\n");
+		String msg = okMes.append(errMes).append(creMes).append(sucMes).toString();
+		PF0101.taMes.append(msg);
+		
+		JOptionPane.showMessageDialog(null, PF0101.taMes, PF0101.packageRecordTitle, 1);
+	}
+	
+	private static String[] processPackage(String[] temp, String getPath, String savePath, StringBuffer sucMes, StringBuffer creMes, StringBuffer errMes, Integer sucCount, Integer errCount) {
 		for (String tmp : temp) {
 			if (tmp.contains("\\")) {
 				tmp = tmp.replace("\\", "/");
@@ -266,8 +298,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 						}
 						if (checkFileName == 1 || getFile.exists()) {
 							if (!saveFile.exists()) {
-								creMes.append(savePath + "/" + selectFilePath + "\n");
-								saveFile.mkdirs();
+								if(saveFile.mkdirs())
+									creMes.append(savePath + "/" + selectFilePath + "\n");
 							}
 							FileChannel inChannel = new FileInputStream(getPath + "/" + tmp).getChannel();
 							FileChannel outChannel = new FileOutputStream(savePath + "/" + tmp).getChannel();
@@ -288,15 +320,16 @@ class ActionControlInUnixLikeOS implements ActionListener {
 						errCount++;
 					}
 				} catch (Exception e) {
+					errMes.append(e.getMessage()+"\n");
+					errCount++;
 					e.printStackTrace();
 				}
 			}
 		}
-		okMes.append("推送檔案總數: "+temp.length+" 個, 成功推送: "+sucCount+" 個, 推送失敗: "+errCount+" 個\n");
-		String msg = okMes.append(errMes).append(creMes).append(sucMes).toString();
-		PF0101.taMes.append(msg);
-		
-		JOptionPane.showMessageDialog(null, PF0101.taMes, PF0101.packageRecordTitle, 1);
+		String[] res = new String[2];
+		res[0] = String.valueOf(sucCount);
+		res[1] = String.valueOf(errCount);
+		return res;
 	}
 	
 	public static void folderInput() {

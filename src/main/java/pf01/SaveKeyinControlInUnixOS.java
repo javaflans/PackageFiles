@@ -83,11 +83,13 @@ public class SaveKeyinControlInUnixOS implements KeyListener {
 		// TODO Auto-generated method stub
 		String value = PF0101.tfSaveFile.getText();
 		if (this.appearNumber(value, ".") < 3 && !value.contains(":")) {
+			/*
 			if (e.getKeyChar() == '/') {
 				if (value.startsWith("/") && value.length() < 2)
 					PF0101.tfSaveFile.setText("//172.16.");
 				PF0101.tfSaveFile.setCaretPosition(PF0101.tfSaveFile.getText().length());
-			} else if (value.startsWith("//") && e.getKeyChar() == '1') {
+			} else */
+			if (value.startsWith("//") && e.getKeyChar() == '1') {
 				if (value.startsWith("//1"))
 					PF0101.tfSaveFile.setText("//172.");
 				if (value.startsWith("//172.1"))

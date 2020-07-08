@@ -10,11 +10,6 @@ import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextArea;
 import java.awt.TextField;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,7 +17,6 @@ import javax.swing.JFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
  
 public class PF0101 {
 
@@ -32,12 +26,19 @@ public class PF0101 {
 	static final String contentText = "操作說明:\n" 
 			+ "–來源路徑: 指定本機檔案來源路徑 \n   D:\\project\\workspace\\web_moi_kcg\n"
 			+ "–目標路徑: 指定推送檔案目的地路徑 \n   \\\\127.0.0.1\\moiland\\webapp\n"
-			+ "–檔案位置: 輸入檔案名稱,可以用';'符號切分多個檔案 \n   WEB-INF\\src\\...\\AjaxReport.java; ADM\\ASL05\\ASL0502.jsp\n" + "\n"
+			+ "–檔案位置: 輸入檔案名稱,可以用';'符號切分多個檔案 \n   WEB-INF\\src\\...\\AjaxReport.java; ADM\\ASL05\\ASL0502.jsp\n\n"
+			+ "–AP列表: 提供可以多選AP來達到同時推送到多個AP目標路徑,\n   並且可以做到Remote Shell執行AP下上重啟功能\n   設定檔於 resources\\config.yml\n"
 			+ "功能說明:\n" 
 			+ "–輸入檔案位置: 提供可批次輸入本機來源路徑，\n   依檔案位置欄位內容，批次列於檔案列表\n"
 			+ "–從來源路徑匯入清單: 提供匯入自指定來源路徑\n   目錄下的檔案清單(自動探索子目錄)。\n"
-			+ "–推送檔案: 提供可批次輸入本機來源路徑，\n   依檔案列表的檔案清單內容，推送至目標路徑\n" + "–清除列表: 清空檔案列表內容\n"
-			+ "–匯入純文字檔: 以純文字檔案，將檔案內容匯入至檔案列表中\n" + "–切換原始/執行檔: 切換 java / classes 路徑\n   src←→classes，java←→class。\n"
+			+ "–推送檔案: 提供可批次輸入本機來源路徑，\n   依檔案列表的檔案清單內容，推送至目標路徑\n   可配合AP列表來達到多個APServer目標路徑推送\n   "
+			+ "設定方式:\n   "
+			+ "->來源路徑: D:\\project\\ws\\gmwork\\landra\\webroot\n   "
+			+ "->目標路徑: \\opt\\moiland\\webapp\n   " 
+			+ "->AP列表: 勾選指定AP清單\n" 
+			+ "–清除列表: 清空檔案列表內容\n"
+			+ "–匯入純文字檔: 以純文字檔案，將檔案內容匯入至檔案列表中\n" 
+			+ "–切換原始/執行檔: 切換 java / classes 路徑\n   src←→classes，java←→class。\n"
 			+ "–加減WebRoot: 在檔案列表中每列前方加上'WebRoot\\\"前輟\n   WEB-INF←→WebRoot\\WEB-INF。\n"
 			+ "–加減webapp: 在檔案列表中每列前方加上'webapp\\\"前輟\n   WEB-INF←→webapp\\WEB-INF。\n"
 			+ "–匯出Bat檔: 將輸入的檔案例表打包功能，\n   匯出成可於Windows環境下獨力執行的.bat檔\n" + "\n" 

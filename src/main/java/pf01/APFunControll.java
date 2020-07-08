@@ -28,13 +28,15 @@ public class APFunControll implements ActionListener {
 						data.get("pwd").toString());
 				int status = 0;
 				if (chAP.getLabel().equals("landAE")) {
-					String[] cmds = { "sh apstop"};
+					String[] cmds = { "sh apstop" };
 					status = sshExecutor.execute(cmds);
-					String[] cmds2 = { "sh apstart"};
+					String[] cmds2 = { "sh apstart" };
 					status = sshExecutor.execute(cmds2);
 				} else {
-					String[] cmds = { "cd /opt/jboss/bin", "./apstop.sh", "./apstart.sh" };
+					String[] cmds = { "cd /opt/jboss/bin", "./apstop.sh", "./rm_tmpDir.sh" };
 					status = sshExecutor.execute(cmds);
+					String[] cmds2 = { "cd /opt/jboss/bin", "./apstart.sh" };
+					status = sshExecutor.execute(cmds2);
 				}
 
 				// Vector<String> stdout = sshExecutor.getStandardOutput();
