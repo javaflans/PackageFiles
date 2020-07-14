@@ -14,3 +14,7 @@ landAE:
   url: 172.16.32.46
   id: jboss
   pwd: jboss
+landHA:
+  url: 172.16.32.58
+  id: jboss
+  pwd: jboss  
