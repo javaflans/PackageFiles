@@ -255,6 +255,7 @@ class ActionControlInWindowsOS implements ActionListener {
 					totCount += temp.length;
 					Map<String, Object> data = (Map<String, Object>) config.get(chAP.getLabel());
 					String newSavePath = "\\\\"+data.get("url").toString()+(savePath.startsWith("\\")?savePath:("\\")+savePath);
+					sucMes.append("# "+chAP.getLabel()+": \n");
 					String[] res = processPackage(temp, getPath, newSavePath, sucMes, creMes, errMes, sucCount, errCount);
 					sucCount = Integer.parseInt(res[0]);
 					errCount = Integer.parseInt(res[1]);
@@ -309,7 +310,7 @@ class ActionControlInWindowsOS implements ActionListener {
 							FileChannel outChannel = new FileOutputStream(savePath + "\\" + tmp).getChannel();
 							long lastTime = getFile.lastModified();
 							sucMes.append("來源檔案" + getPath + "\\" + tmp + "\n");
-							sucMes.append("  移動到" + savePath + "\\" + tmp + "\n\n");
+							sucMes.append("  移動到" + savePath + "\\" + tmp + "\n");
 							outChannel.transferFrom(inChannel, 0L, inChannel.size());
 							inChannel.close();
 							outChannel.close();
@@ -320,7 +321,7 @@ class ActionControlInWindowsOS implements ActionListener {
 							errCount++;
 						}
 					} else {
-						errMes.append("來源路徑不存在： " + getPath + "\\ \n");
+						errMes.append("來源路徑不存在： " + new File(getPath + "\\" + tmp).getParentFile() +"\n");
 						errCount++;
 					}
 				} catch (Exception e) {

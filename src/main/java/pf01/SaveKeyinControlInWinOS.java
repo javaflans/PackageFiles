@@ -1,9 +1,11 @@
 package pf01;
 
+import java.awt.Checkbox;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,17 +21,17 @@ public class SaveKeyinControlInWinOS implements KeyListener {
 	private long keyReleaseThreshold = 300;
 	private boolean isScaningFolder = false;
 	
-	private void doFolderScan(String parentPath, String targetPath) {
+	private void doFolderScan(String preStr, String parentPath, String targetPath) {
 		isScaningFolder = true;
 		CompletableFuture.supplyAsync(() -> {
 			try {
-				File folder = new File(parentPath);
+				File folder = new File(preStr + parentPath);
 				if (folder.isDirectory()) {
 					String[] list = folder.list();
 					String target = "";
 					int cnt = 0;
 					for (String p : list) {
-						if ((StringUtils.containsIgnoreCase(p, targetPath)) && new File(parentPath, p).isDirectory()) {
+						if ((StringUtils.containsIgnoreCase(p, targetPath)) && new File(preStr + parentPath, p).isDirectory()) {
 							if (StringUtils.equalsIgnoreCase(p, targetPath)) {
 								cnt = 1;
 								target = p;
@@ -81,7 +83,16 @@ public class SaveKeyinControlInWinOS implements KeyListener {
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 		String value = PF0101.tfSaveFile.getText();
-		if (this.appearNumber(value, "\\.") < 3 && !value.contains(":")) {
+		Map<String, Object> config = PF0101.config;
+		String preStr = "";
+		for (Checkbox chAP : PF0101.chAPs) {
+			if (chAP.getState()) {
+				Map<String, Object> data = (Map<String, Object>) config.get(chAP.getLabel());
+				preStr = "\\\\"+data.get("url").toString();
+				break;
+			}
+		}
+		if (this.appearNumber(value, "\\.") < 3 && !value.contains(":") && StringUtils.isBlank(preStr)) {
 			/*if (e.getKeyChar() == '\\') {
 				if (value.startsWith("\\") && value.length() < 2)
 					PF0101.tfSaveFile.setText("\\\\172.16.");
@@ -113,14 +124,13 @@ public class SaveKeyinControlInWinOS implements KeyListener {
 		} else if (e.getKeyCode() != 8) {
 			String parentPath = value.substring(0, value.lastIndexOf("\\") + 1);
 			String targetPath = value.substring(value.lastIndexOf("\\") + 1);
-			
 			long thisTimeMills = System.currentTimeMillis();
 			long diffTimeMill = thisTimeMills - previousKeyReleaseTime;
 			previousKeyReleaseTime = thisTimeMills;
 
 			if (diffTimeMill > keyReleaseThreshold && !isScaningFolder) {
 				log.info("do FolderScan");
-				doFolderScan(parentPath, targetPath);
+				doFolderScan(preStr, parentPath, targetPath);
 			}
 		}
 	}
