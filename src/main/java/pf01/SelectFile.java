@@ -44,14 +44,7 @@ public class SelectFile implements ActionListener {
 			}
 
 			PF0101.tfHidden.setText(hiddenFile);
-
-			if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-
-				ActionControlInWindowsOS.keyin();
-			} else {
-
-				ActionControlInUnixLikeOS.keyin();
-			}
+			ActionControl.keyin();
 
 		}
 

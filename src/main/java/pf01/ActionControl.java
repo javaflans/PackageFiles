@@ -25,7 +25,7 @@ import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileOutputStream;
 
-class ActionControlInUnixLikeOS implements ActionListener {
+class ActionControl implements ActionListener {
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 	public void actionPerformed(ActionEvent e) {
 		String action = new String(e.getActionCommand());
@@ -65,8 +65,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			String[] temp = tablePath.split("\n");
 			tablePath = "";
 			for (String tmp : temp) {
-				if (tmp.contains("\\")) {
-					tmp = tmp.replace("\\", "/");
+				if (tmp.contains("/")) {
+					tmp = tmp.replace("/", "\\");
 				}
 				if ((tmp.length() > 0) && (!tmp.equals(""))) {
 					if (tmp.substring(0, 1).equals("\\")) {
@@ -92,8 +92,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			String[] temp = tablePath.split("\n");
 			tablePath = "";
 			for (String tmp : temp) {
-				if (tmp.contains("\\")) {
-					tmp = tmp.replace("\\", "/");
+				if (tmp.contains("/")) {
+					tmp = tmp.replace("/", "\\");
 				}
 				if ((tmp.length() > 0) && (!tmp.equals(""))) {
 					if (tmp.substring(0, 1).equals("\\")) {
@@ -166,14 +166,14 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			JOptionPane.showMessageDialog(null, "尚未輸入檔案位置", "警告", 2);
 			return;
 		}
-		if (!getPath.substring(0, 6).equals("/home/")) {
+		if ((!getPath.substring(1, 2).equals(":")) && (!getPath.substring(1, 2).equals("\\"))) {
 			PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
-			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑", "警告", 2);
 			return;
 		}
-//		if (!savePath.substring(0, 6).equals("/home/")) {
+//		if ((!savePath.substring(1, 2).equals(":")) && (!savePath.substring(1, 2).equals("\\"))) {
 //			PF0101.tfSaveFile.setBackground(new Color(255, 160, 160));
-//			JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+//			JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑", "警告", 2);
 //			return;
 //		}
 		if (StringUtils.isNotBlank(PF0101.taTable.getText()) && PF0101.taTable.getText().startsWith("操作說明")) {
@@ -182,12 +182,12 @@ class ActionControlInUnixLikeOS implements ActionListener {
 
 		String[] temp = PF0101.tfSelectFile.getText().split(";");
 		for (String tmp : temp) {
-			if (tmp.contains("\\")) {
-				tmp = tmp.replace("\\", "/");
+			if (tmp.contains("/")) {
+				tmp = tmp.replace("/", "\\");
 			}
-			// 進來的檔案路徑也都是絕對路徑 這裡用來源路徑的路徑除去 進來的檔案路徑裡相同的部份
-			tmp = tmp.substring(getPath.length() + 1);
-
+			if ((tmp.length() > 2) && ((tmp.substring(1, 2).equals(":")) || (tmp.substring(1, 2).equals("\\")))) {
+				tmp = tmp.substring(getPath.length() + 1);
+			}
 			PF0101.taTable.append(tmp + "\n");
 		}
 		PF0101.tfSelectFile.setText("");
@@ -206,7 +206,7 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		PF0101.tfSaveFile.setBackground(new Color(255, 255, 255));
 		PF0101.tfSelectFile.setBackground(new Color(255, 255, 255));
 		PF0101.taTable.setBackground(new Color(255, 255, 255));
-		int totCount=0,sucCount=0,errCount=0;
+		int totCount = 0,sucCount = 0, errCount = 0;
 		if (getPath.equals("")) {
 			PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
 			JOptionPane.showMessageDialog(null, "尚未輸入來源路徑", "警告", 2);
@@ -222,15 +222,15 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			JOptionPane.showMessageDialog(null, "尚未輸入檔案位置", "警告", 2);
 			return;
 		}
-		if (!getPath.substring(0, 6).equals("/home/")) {
+		if ((!getPath.substring(1, 2).equals(":")) && (!getPath.substring(1, 2).equals("\\"))) {
 			PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
-			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑", "警告", 2);
 			return;
 		}
 		/*
-		if (!savePath.substring(0, 6).equals("/home/")) {
+		if ((!savePath.substring(1, 2).equals(":")) && (!savePath.substring(1, 2).equals("\\"))) {
 			PF0101.tfSaveFile.setBackground(new Color(255, 160, 160));
-			JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+			JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑", "警告", 2);
 			return;
 		}
 		*/
@@ -251,7 +251,7 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		creMes.append("========================\n");
 
 		String[] temp = tablePath.split("\n");
-		if ((!savePath.substring(1, 2).equals("\\"))) {
+		if ((!savePath.substring(1, 2).equals(":")) && (!savePath.substring(1, 2).equals("\\"))) {
 			Map<String, Object> config = PF0101.config;
 
 			for (Checkbox chAP : PF0101.chAPs) {
@@ -272,8 +272,7 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			sucCount = Integer.parseInt(res[0]);
 			errCount = Integer.parseInt(res[1]);
 		}
-		
-		okMes.append("推送檔案總數: "+temp.length+" 個, 成功推送: "+sucCount+" 個, 推送失敗: "+errCount+" 個\n");
+		okMes.append("推送檔案總數: " + totCount + " 個, 成功推送: " + sucCount + " 個, 推送失敗: " + errCount + " 個\n");
 		String msg = okMes.append(errMes).append(creMes).append(sucMes).toString();
 		PF0101.taMes.append(msg);
 		
@@ -282,22 +281,26 @@ class ActionControlInUnixLikeOS implements ActionListener {
 	
 	private static String[] processPackage(String[] temp, String getPath, String savePath, StringBuffer sucMes, StringBuffer creMes, StringBuffer errMes, Integer sucCount, Integer errCount, NtlmPasswordAuthentication auth) {
 		for (String tmp : temp) {
-			if (tmp.contains("\\")) {
-				tmp = tmp.replace("\\", "/");
+			if (tmp.contains("/")) {
+				tmp = tmp.replace("/", "\\");
 			}
 			if (!temp.equals("")) {
-				String[] box = tmp.split("/");
+				String[] box = tmp.split("\\\\");
 				String selectFilePath = new String();
 				for (int j = 0; j < box.length - 1; j++) {
-					selectFilePath = selectFilePath + "/" + box[j];
+					selectFilePath = selectFilePath + "\\" + box[j];
 				}
 				SmbFileOutputStream outputSmbFile = null;
 			    FileInputStream inputFile = null;
 				try {
-					File saveFile = new File(savePath + "/" + selectFilePath);
-					File getFile = new File(getPath + "/" + tmp);
-					File selectFile = new File(savePath + "/" + tmp);
-					String[] check = new File(getPath + "/" + tmp).getParentFile().list();
+					File getFile = null;
+					File saveFile = null;
+					File selectFile = null;
+					
+					getFile = new File(getPath + "\\" + tmp);
+					saveFile = new File(savePath + "\\" + selectFilePath);
+					selectFile = new File(savePath + "\\" + tmp);
+					String[] check = new File(getPath + "\\" + tmp).getParentFile().list();
 					if (check != null) {
 						int checkFileName = 0;
 						for (int j = 0; j < check.length; j++) {
@@ -308,9 +311,10 @@ class ActionControlInUnixLikeOS implements ActionListener {
 						if (checkFileName == 1 || getFile.exists()) {
 							if (!saveFile.exists()) {
 								if(saveFile.mkdirs())
-									creMes.append(savePath + "/" + selectFilePath + "\n");
+									creMes.append(savePath + "\\" + selectFilePath + "\n");
 							}
-							File file = new File(getPath + "/" + tmp);
+							
+							File file = new File(getPath + "\\" + tmp);
 							String filename = file.getName();
 							String smbPath = "smb:" + savePath.replace("\\", "/") + "/" + tmp.replace("\\", "/");
 							SmbFile smbFile = new SmbFile(smbPath, auth);
@@ -321,17 +325,17 @@ class ActionControlInUnixLikeOS implements ActionListener {
 							while ((len = inputFile.read(buf)) > 0) {
 								outputSmbFile.write(buf, 0, len);
 							}
-							sucMes.append("來源檔案" + getPath + "/" + tmp + "\n");
-							sucMes.append("  移動到" + savePath + "/" + tmp + "\n");
+							sucMes.append("來源檔案" + getPath + "\\" + tmp + "\n");
+							sucMes.append("  移動到" + savePath + "\\" + tmp + "\n");
 							sucCount++;
 							inputFile.close();
 							outputSmbFile.close();
 						} else {
-							errMes.append("目標檔案不存在： " + getPath + "/" + tmp + " \n");
+							errMes.append("來源檔案不存在： " + getPath + "\\" + tmp + " \n");
 							errCount++;
 						}
 					} else {
-						errMes.append("來源路徑不存在： " + new File(getPath + "/" + tmp).getParentFile() +"\n");
+						errMes.append("來源路徑不存在： " + new File(getPath + "\\" + tmp).getParentFile() +"\n");
 						errCount++;
 					}
 				} catch (Exception e) {
@@ -349,20 +353,24 @@ class ActionControlInUnixLikeOS implements ActionListener {
 	
 	private static String[] processPackage(String[] temp, String getPath, String savePath, StringBuffer sucMes, StringBuffer creMes, StringBuffer errMes, Integer sucCount, Integer errCount) {
 		for (String tmp : temp) {
-			if (tmp.contains("\\")) {
-				tmp = tmp.replace("\\", "/");
+			if (tmp.contains("/")) {
+				tmp = tmp.replace("/", "\\");
 			}
 			if (!temp.equals("")) {
-				String[] box = tmp.split("/");
+				String[] box = tmp.split("\\\\");
 				String selectFilePath = new String();
 				for (int j = 0; j < box.length - 1; j++) {
-					selectFilePath = selectFilePath + "/" + box[j];
+					selectFilePath = selectFilePath + "\\" + box[j];
 				}
 				try {
-					File saveFile = new File(savePath + "/" + selectFilePath);
-					File getFile = new File(getPath + "/" + tmp);
-					File selectFile = new File(savePath + "/" + tmp);
-					String[] check = new File(getPath + "/" + tmp).getParentFile().list();
+					File getFile = null;
+					File saveFile = null;
+					File selectFile = null;
+					
+					getFile = new File(getPath + "\\" + tmp);
+					saveFile = new File(savePath + "\\" + selectFilePath);
+					selectFile = new File(savePath + "\\" + tmp);
+					String[] check = new File(getPath + "\\" + tmp).getParentFile().list();
 					if (check != null) {
 						int checkFileName = 0;
 						for (int j = 0; j < check.length; j++) {
@@ -373,24 +381,24 @@ class ActionControlInUnixLikeOS implements ActionListener {
 						if (checkFileName == 1 || getFile.exists()) {
 							if (!saveFile.exists()) {
 								if(saveFile.mkdirs())
-									creMes.append(savePath + "/" + selectFilePath + "\n");
+									creMes.append(savePath + "\\" + selectFilePath + "\n");
 							}
-							FileChannel inChannel = new FileInputStream(getPath + "/" + tmp).getChannel();
-							FileChannel outChannel = new FileOutputStream(savePath + "/" + tmp).getChannel();
+							FileChannel inChannel = new FileInputStream(getPath + "\\" + tmp).getChannel();
+							FileChannel outChannel = new FileOutputStream(savePath + "\\" + tmp).getChannel();
 							long lastTime = getFile.lastModified();
-							sucMes.append("來源檔案" + getPath + "/" + tmp + "\n");
-							sucMes.append("  移動到" + savePath + "/" + tmp + "\n");
+							sucMes.append("來源檔案" + getPath + "\\" + tmp + "\n");
+							sucMes.append("  移動到" + savePath + "\\" + tmp + "\n");
 							outChannel.transferFrom(inChannel, 0L, inChannel.size());
 							inChannel.close();
 							outChannel.close();
 							sucCount++;
 							selectFile.setLastModified(lastTime);
 						} else {
-							errMes.append("目標檔案不存在： " + getPath + "/" + tmp + " \n");
+							errMes.append("來源檔案不存在： " + getPath + "\\" + tmp + " \n");
 							errCount++;
 						}
 					} else {
-						errMes.append("來源路徑不存在： " + new File(getPath + "/" + tmp).getParentFile() +"\n");
+						errMes.append("來源路徑不存在： " + new File(getPath + "\\" + tmp).getParentFile() +"\n");
 						errCount++;
 					}
 				} catch (Exception e) {
@@ -405,7 +413,7 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		res[1] = String.valueOf(errCount);
 		return res;
 	}
-	
+
 	public static void folderInput() {
 		String getPath = PF0101.tfGetFile.getText();
 		if (getPath.equals("")) {
@@ -418,17 +426,17 @@ class ActionControlInUnixLikeOS implements ActionListener {
 			JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑", "警告", 2);
 			return;
 		}
-		if (getPath.contains("\\")) {
-			getPath = getPath.replace("\\", "/");
+		if (getPath.contains("/")) {
+			getPath = getPath.replace("/", "\\");
 		}
 		File folder = new File(getPath);
 		StringBuffer path = new StringBuffer("");
 		if (folder.exists() && folder.isDirectory()) {
 			getFiles(folder,path);
 			if(PF0101.taTable.getText().startsWith("操作")) {
-				PF0101.taTable.setText(path.toString());
+				PF0101.taTable.setText(path.toString().replace(getPath, ""));
 			} else {
-				PF0101.taTable.setText(PF0101.taTable.getText()+path.toString());
+				PF0101.taTable.setText(PF0101.taTable.getText()+path.toString().replace(getPath, ""));
 			}
 		} else {
 			PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
@@ -465,14 +473,14 @@ class ActionControlInUnixLikeOS implements ActionListener {
 //				JOptionPane.showMessageDialog(null, "尚未輸入目標路徑", "警告", 2);
 //				return;
 //			}
-//			if (!getPath.substring(0, 6).equals("/home/")) {
+//			if ((!getPath.substring(1, 2).equals(":")) && (!getPath.substring(1, 2).equals("\\"))) {
 //				PF0101.tfGetFile.setBackground(new Color(255, 160, 160));
-//				JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+//				JOptionPane.showMessageDialog(null, "來源路徑須為絕對路徑", "警告", 2);
 //				return;
 //			}
-//			if (!savePath.substring(0, 6).equals("/home/")) {
+//			if ((!savePath.substring(1, 2).equals(":")) && (!savePath.substring(1, 2).equals("\\"))) {
 //				PF0101.tfSaveFile.setBackground(new Color(255, 160, 160));
-//				JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑，即起始於/home/...", "警告", 2);
+//				JOptionPane.showMessageDialog(null, "目標路徑須為絕對路徑", "警告", 2);
 //				return;
 //			}
 			String inputPath = new String();
@@ -488,7 +496,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 				BufferedReader br = new BufferedReader(fr);
 				String input = new String();
 				while ((input = br.readLine()) != null) {
-					if (StringUtils.isNotBlank(PF0101.taTable.getText()) && PF0101.taTable.getText().startsWith("操作說明")) {
+					if (StringUtils.isNotBlank(PF0101.taTable.getText())
+							&& PF0101.taTable.getText().startsWith("操作說明")) {
 						PF0101.taTable.setText("");
 					}
 					if ((input.substring(1, 2).equals(":")) || (input.substring(1, 2).equals("\\"))) {
@@ -544,8 +553,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 				fwriter.write("set savePath=" + savePath + "\r\n");
 				String[] temp = tablePath.split("\n");
 				for (String tmp : temp) {
-					if (tmp.contains("\\")) {
-						tmp = tmp.replace("\\", "/");
+					if (tmp.contains("/")) {
+						tmp = tmp.replace("/", "\\");
 					}
 					fwriter.write("mkdir %savePath%\\" + tmp.substring(0, tmp.lastIndexOf("\\")) + "\r\n");
 					fwriter.write("copy /Y %getPath%\\" + tmp + " %savePath%\\" + tmp + "\r\n");

@@ -426,41 +426,21 @@ public class PF0101 {
 		
 		
 
-		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-			// os¬O windows
-			btKeyin.addActionListener(new ActionControlInWindowsOS());
-			btPack.addActionListener(new ActionControlInWindowsOS());
-			btClear.addActionListener(new ActionControlInWindowsOS());
-			btGetFile.addActionListener(new GetFile());
-			btSaveFile.addActionListener(new SaveFile());
-			btSelectFile.addActionListener(new SelectFile());
-			btFoldInput.addActionListener(new ActionControlInWindowsOS());
-			btInput.addActionListener(new ActionControlInWindowsOS());
-			btOutScript.addActionListener(new ActionControlInWindowsOS());
-			btSwitch.addActionListener(new ActionControlInWindowsOS());
-			btADWebRoot.addActionListener(new ActionControlInWindowsOS());
-			btADwebapp.addActionListener(new ActionControlInWindowsOS());
-			btOutBat.addActionListener(new ActionControlInWindowsOS());
-			tfGetFile.addKeyListener(new GetKeyinControlInWinOS());
-			tfSaveFile.addKeyListener(new SaveKeyinControlInWinOS());
-		} else {
-			// os ¬O unix-like
-			btKeyin.addActionListener(new ActionControlInUnixLikeOS());
-			btPack.addActionListener(new ActionControlInUnixLikeOS());
-			btClear.addActionListener(new ActionControlInUnixLikeOS());
-			btGetFile.addActionListener(new GetFile());
-			btSaveFile.addActionListener(new SaveFile());
-			btSelectFile.addActionListener(new SelectFile());
-			btFoldInput.addActionListener(new ActionControlInUnixLikeOS());
-			btInput.addActionListener(new ActionControlInUnixLikeOS());
-			btOutScript.addActionListener(new ActionControlInUnixLikeOS());
-			btSwitch.addActionListener(new ActionControlInUnixLikeOS());
-			btADWebRoot.addActionListener(new ActionControlInUnixLikeOS());
-			btADwebapp.addActionListener(new ActionControlInUnixLikeOS());
-			btOutBat.addActionListener(new ActionControlInUnixLikeOS());
-			tfGetFile.addKeyListener(new GetKeyinControlInUnixOS());
-			tfSaveFile.addKeyListener(new SaveKeyinControlInUnixOS());
-		}
+		btKeyin.addActionListener(new ActionControl());
+		btPack.addActionListener(new ActionControl());
+		btClear.addActionListener(new ActionControl());
+		btGetFile.addActionListener(new GetFile());
+		btSaveFile.addActionListener(new SaveFile());
+		btSelectFile.addActionListener(new SelectFile());
+		btFoldInput.addActionListener(new ActionControl());
+		btInput.addActionListener(new ActionControl());
+		btOutScript.addActionListener(new ActionControl());
+		btSwitch.addActionListener(new ActionControl());
+		btADWebRoot.addActionListener(new ActionControl());
+		btADwebapp.addActionListener(new ActionControl());
+		btOutBat.addActionListener(new ActionControl());
+		tfGetFile.addKeyListener(new GetKeyinControl());
+		tfSaveFile.addKeyListener(new SaveKeyinControl());
 		taTable.addFocusListener(new FocusContol());
 		btAPFun.addActionListener(new APFunControll());
 		f1.setVisible(true);
