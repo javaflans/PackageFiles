@@ -39,6 +39,8 @@ dependencies {
 	compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
 	// https://mvnrepository.com/artifact/com.jcraft/com.jcraft.jsch
 	compile group: 'com.jcraft', name: 'jsch', version: '0.1.44-1'
+	// https://mvnrepository.com/artifact/org.samba.jcifs/jcifs
+	compile group: 'org.samba.jcifs', name: 'jcifs', version: '1.3.3'
 	
     
 }
@@ -52,7 +54,7 @@ repositories {
 
 configure([compileJava, compileTestJava]) {
   
-  options.encoding = "CP950"  //如果你要跑在Big5的JAVA環境的話，解開前面的註解
+  options.encoding = "CP950"  
 }
 
 

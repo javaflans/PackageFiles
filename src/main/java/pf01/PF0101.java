@@ -65,6 +65,7 @@ public class PF0101 {
 	static TextField tfHidden = new TextField("", 35);
 	static Checkbox chAPs[];
 	static Panel pnAP;
+	static Panel pnAP2;
 	static Button btGetFile = new Button("ÂsÄý");
 	static Button btSaveFile = new Button("ÂsÄý");
 	static Button btSelectFile = new Button("ÂsÄý");
@@ -143,17 +144,17 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 0;
 		c1.anchor = 17;
-		f1.add(lbSaveFile, c1);
+		f1.add(lbAP, c1);
 		
 		c1.gridx = 0;
-		c1.gridy = 3;
+		c1.gridy = 4;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
 		c1.weighty = 0.0D;
 		c1.fill = 0;
 		c1.anchor = 17;
-		f1.add(lbSelectFile, c1);
+		f1.add(lbSaveFile, c1);
 		
 		c1.gridx = 0;
 		c1.gridy = 5;
@@ -163,7 +164,7 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 2;
 		c1.anchor = 17;
-		f1.add(lbAP, c1);
+		f1.add(lbSelectFile, c1);
 
 		c1.gridx = 0;
 		c1.gridy = 6;
@@ -207,7 +208,21 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 0;
 		c1.anchor = 17;
-		f1.add(tfSaveFile, c1);
+		pnAP = new Panel(new GridLayout(1, config.size()));
+		pnAP2 = new Panel(new GridLayout(1, config.size()));
+		int i=0;
+		chAPs = new Checkbox[config.size()];
+		for(Entry<String,Object> ent:config.entrySet()) {
+			if(i<4) {
+				chAPs[i] = new Checkbox(ent.getKey());
+				pnAP.add(chAPs[i]);
+			} else {
+				chAPs[i] = new Checkbox(ent.getKey());
+				pnAP2.add(chAPs[i]);
+			}
+			i++;
+		}
+		f1.add(pnAP, c1);
 		
 		c1.gridx = 1;
 		c1.gridy = 3;
@@ -217,7 +232,18 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 0;
 		c1.anchor = 17;
-		f1.add(tfSelectFile, c1);
+		f1.add(pnAP2, c1);
+		
+		
+		c1.gridx = 1;
+		c1.gridy = 4;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 0.0D;
+		c1.weighty = 0.0D;
+		c1.fill = 0;
+		c1.anchor = 17;
+		f1.add(tfSaveFile, c1);
 		
 		c1.gridx = 1;
 		c1.gridy = 5;
@@ -227,15 +253,7 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 0;
 		c1.anchor = 17;
-		pnAP = new Panel(new GridLayout(1, config.size()));
-		int i=0;
-		chAPs = new Checkbox[config.size()];
-		for(Entry<String,Object> ent:config.entrySet()) {
-			chAPs[i] = new Checkbox(ent.getKey());
-			pnAP.add(chAPs[i]);
-			i++;
-		}
-		f1.add(pnAP, c1);
+		f1.add(tfSelectFile, c1);
 		
 		
 		
@@ -259,17 +277,17 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 2;
 		c1.anchor = 17;
-		f1.add(btSaveFile, c1);
+		f1.add(btAPFun, c1);
 
 		c1.gridx = 3;
-		c1.gridy = 3;
+		c1.gridy = 4;
 		c1.gridwidth = 1;
 		c1.gridheight = 1;
 		c1.weightx = 0.0D;
 		c1.weighty = 0.0D;
 		c1.fill = 2;
 		c1.anchor = 17;
-		f1.add(btSelectFile, c1);
+		f1.add(btSaveFile, c1);
 		
 		c1.gridx = 3;
 		c1.gridy = 5;
@@ -279,7 +297,7 @@ public class PF0101 {
 		c1.weighty = 0.0D;
 		c1.fill = 2;
 		c1.anchor = 17;
-		f1.add(btAPFun, c1);
+		f1.add(btSelectFile, c1);
 		
 		//input function start
 		c1.gridx = 3;

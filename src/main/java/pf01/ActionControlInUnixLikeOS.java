@@ -16,15 +16,20 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.StringUtils;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileOutputStream;
 
 class ActionControlInUnixLikeOS implements ActionListener {
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 	public void actionPerformed(ActionEvent e) {
 		String action = new String(e.getActionCommand());
+		log.debug("-------------");
 		if ("清除列表".equals(action)) {
 			clear();
 		} else if ("瀏覽檔案".equals(action)) {
@@ -255,7 +260,8 @@ class ActionControlInUnixLikeOS implements ActionListener {
 					Map<String, Object> data = (Map<String, Object>) config.get(chAP.getLabel());
 					String newSavePath = "\\\\"+data.get("url").toString()+(savePath.startsWith("\\")?savePath:("\\")+savePath);
 					sucMes.append("# "+chAP.getLabel()+": \n");
-					String[] res = processPackage(temp, getPath, newSavePath, sucMes, creMes, errMes, sucCount, errCount);
+					NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(null, data.get("id").toString(), data.get("pwd").toString());
+					String[] res = processPackage(temp, getPath, newSavePath, sucMes, creMes, errMes, sucCount, errCount, auth);
 					sucCount = Integer.parseInt(res[0]);
 					errCount = Integer.parseInt(res[1]);
 				}
@@ -272,6 +278,73 @@ class ActionControlInUnixLikeOS implements ActionListener {
 		PF0101.taMes.append(msg);
 		
 		JOptionPane.showMessageDialog(null, PF0101.taMes, PF0101.packageRecordTitle, 1);
+	}
+	
+	private static String[] processPackage(String[] temp, String getPath, String savePath, StringBuffer sucMes, StringBuffer creMes, StringBuffer errMes, Integer sucCount, Integer errCount, NtlmPasswordAuthentication auth) {
+		for (String tmp : temp) {
+			if (tmp.contains("\\")) {
+				tmp = tmp.replace("\\", "/");
+			}
+			if (!temp.equals("")) {
+				String[] box = tmp.split("/");
+				String selectFilePath = new String();
+				for (int j = 0; j < box.length - 1; j++) {
+					selectFilePath = selectFilePath + "/" + box[j];
+				}
+				SmbFileOutputStream outputSmbFile = null;
+			    FileInputStream inputFile = null;
+				try {
+					File saveFile = new File(savePath + "/" + selectFilePath);
+					File getFile = new File(getPath + "/" + tmp);
+					File selectFile = new File(savePath + "/" + tmp);
+					String[] check = new File(getPath + "/" + tmp).getParentFile().list();
+					if (check != null) {
+						int checkFileName = 0;
+						for (int j = 0; j < check.length; j++) {
+							if (check[j].equals(box[(box.length - 1)])) {
+								checkFileName++;
+							}
+						}
+						if (checkFileName == 1 || getFile.exists()) {
+							if (!saveFile.exists()) {
+								if(saveFile.mkdirs())
+									creMes.append(savePath + "/" + selectFilePath + "\n");
+							}
+							File file = new File(getPath + "/" + tmp);
+							String filename = file.getName();
+							String smbPath = "smb:" + savePath.replace("\\", "/") + "/" + tmp.replace("\\", "/");
+							SmbFile smbFile = new SmbFile(smbPath, auth);
+							outputSmbFile = new SmbFileOutputStream(smbFile);
+							inputFile = new FileInputStream(file);
+							int len = 0;
+							byte[] buf = new byte[1024];
+							while ((len = inputFile.read(buf)) > 0) {
+								outputSmbFile.write(buf, 0, len);
+							}
+							sucMes.append("來源檔案" + getPath + "/" + tmp + "\n");
+							sucMes.append("  移動到" + savePath + "/" + tmp + "\n");
+							sucCount++;
+							inputFile.close();
+							outputSmbFile.close();
+						} else {
+							errMes.append("目標檔案不存在： " + getPath + "/" + tmp + " \n");
+							errCount++;
+						}
+					} else {
+						errMes.append("來源路徑不存在： " + new File(getPath + "/" + tmp).getParentFile() +"\n");
+						errCount++;
+					}
+				} catch (Exception e) {
+					errMes.append(e.getMessage()+"\n");
+					errCount++;
+					e.printStackTrace();
+				}
+			}
+		}
+		String[] res = new String[2];
+		res[0] = String.valueOf(sucCount);
+		res[1] = String.valueOf(errCount);
+		return res;
 	}
 	
 	private static String[] processPackage(String[] temp, String getPath, String savePath, StringBuffer sucMes, StringBuffer creMes, StringBuffer errMes, Integer sucCount, Integer errCount) {
