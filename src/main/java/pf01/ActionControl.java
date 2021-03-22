@@ -59,22 +59,30 @@ class ActionControl implements ActionListener {
 
 	public static void switchADWebRoot() {
 		String tablePath = PF0101.taTable.getText();
+		if (tablePath.contains("/")) {
+		    tablePath = tablePath.replace("/", "\\");
+		}
 		if (tablePath.contains("WebRoot")) {
-			tablePath = tablePath.replaceAll("WebRoot", "");
+			tablePath = tablePath.replace("WebRoot/", "").replace("WebRoot\\", "");
 		} else {
 			String[] temp = tablePath.split("\n");
 			tablePath = "";
 			for (String tmp : temp) {
-				if (tmp.contains("/")) {
-					tmp = tmp.replace("/", "\\");
-				}
 				if ((tmp.length() > 0) && (!tmp.equals(""))) {
 					if (tmp.substring(0, 1).equals("\\")) {
+					    if (tmp.contains("webapp")) {
+						tablePath = tablePath + tmp.replace("webapp", "WebRoot")+"\n";
+					    } else {
 						tmp = ("WebRoot" + tmp + "\n");
 						tablePath = tablePath + tmp;
+					    }
 					} else {
+					    if (tmp.contains("webapp")) {
+						tablePath = tablePath + tmp.replace("webapp", "WebRoot")+"\n";
+					    } else {
 						tmp = ("WebRoot\\" + tmp + "\n");
 						tablePath = tablePath + tmp;
+					    }
 					}
 				} else {
 					tablePath = tablePath + "\n";
@@ -86,22 +94,30 @@ class ActionControl implements ActionListener {
 
 	public static void switchADwebapp() {
 		String tablePath = PF0101.taTable.getText();
+		if (tablePath.contains("/")) {
+		    tablePath = tablePath.replace("/", "\\");
+		}
 		if (tablePath.contains("webapp")) {
-			tablePath = tablePath.replaceAll("webapp", "");
+			tablePath = tablePath.replace("webapp/", "").replace("webapp\\", "");
 		} else {
 			String[] temp = tablePath.split("\n");
 			tablePath = "";
 			for (String tmp : temp) {
-				if (tmp.contains("/")) {
-					tmp = tmp.replace("/", "\\");
-				}
 				if ((tmp.length() > 0) && (!tmp.equals(""))) {
 					if (tmp.substring(0, 1).equals("\\")) {
+					    if (tmp.contains("WebRoot")) {
+						tablePath = tablePath + tmp.replace("WebRoot", "webapp")+"\n";
+					    } else {
 						tmp = ("webapp" + tmp + "\n");
 						tablePath = tablePath + tmp;
+					    }
 					} else {
+					    if (tmp.contains("WebRoot")) {
+						tablePath = tablePath + tmp.replace("WebRoot", "webapp")+"\n";
+					    } else {
 						tmp = ("webapp\\" + tmp + "\n");
 						tablePath = tablePath + tmp;
+					    }
 					}
 				} else {
 					tablePath = tablePath + "\n";
@@ -118,19 +134,19 @@ class ActionControl implements ActionListener {
 		if ((tablePath.contains("src")) || (savePath.contains("WebRoot"))) {
 			tablePath = tablePath.replaceAll("src", "classes");
 			if (tablePath.contains("java"))
-				tablePath = tablePath.replaceAll("java", "class");
+				tablePath = tablePath.replace("java", "class");
 			if (tablePath.contains("WebRoot"))
-				tablePath = tablePath.replaceAll("WebRoot", "webapp");
+				tablePath = tablePath.replace("WebRoot", "webapp");
 			if (savePath.contains("WebRoot"))
-				savePath = savePath.replaceAll("WebRoot", "webapp");
+				savePath = savePath.replace("WebRoot", "webapp");
 		} else if ((tablePath.contains("classes")) || (savePath.contains("webapp"))) {
 			tablePath = tablePath.replaceAll("classes", "src");
 			if (tablePath.contains("class"))
-				tablePath = tablePath.replaceAll("class", "java");
+				tablePath = tablePath.replace("class", "java");
 			if (tablePath.contains("webapp"))
-				tablePath = tablePath.replaceAll("webapp", "WebRoot");
+				tablePath = tablePath.replace("webapp", "WebRoot");
 			if (savePath.contains("webapp")) {
-				savePath = savePath.replaceAll("webapp", "WebRoot");
+				savePath = savePath.replace("webapp", "WebRoot");
 			}
 		}
 		PF0101.taTable.setText(tablePath);
