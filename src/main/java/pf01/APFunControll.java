@@ -27,7 +27,7 @@ public class APFunControll implements ActionListener {
 				SSHExecutor sshExecutor = new SSHExecutor(data.get("url").toString(), data.get("id").toString(),
 						data.get("pwd").toString());
 				int status = 0;
-				if (chAP.getLabel().equals("landAE")) {
+				if (chAP.getLabel().equals("landAE") || chAP.getLabel().equals("landAA")) {
 					String[] cmds = { "sh apstop" };
 					status = sshExecutor.execute(cmds);
 					String[] cmds2 = { "sh apstart" };

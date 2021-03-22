@@ -27,3 +27,21 @@
 ## 提醒說明
 - 若有重複檔案，此程式將自行覆蓋，請小心使用。
 - 若目標路徑為AP Server 等網路路徑，請先透過Windows檔案總管訪問，通過登入驗證後再做推送
+
+## Gradle version
+- Gradle 6.4 upper
+
+## Gradle Build
+```
+@Echo off
+cd D:\project\ws\gmwork\PackageFiles\
+call gradle build
+copy /v D:\project\ws\gmwork\PackageFiles\build\libs\PackageFiles.jar D:\project\dev\
+```
+
+## Gradle Run
+```
+@Echo off
+cd D:\project\ws\gmwork\PackageFiles\
+call gradle run
+```
