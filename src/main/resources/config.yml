@@ -1,24 +1,4 @@
 landRA:
-  url: 172.16.32.39
-  id: jboss
-  pwd: jboss
-landRB:
-  url: 172.16.31.7
-  id: jboss
-  pwd: jboss
-landEI:
-  url: 172.16.52.7
-  id: jboss
-  pwd: jboss
-landAA:
-  url: 172.16.32.42
-  id: jboss
-  pwd: jboss    
-landAE:
-  url: 172.16.32.46
-  id: jboss
-  pwd: jboss
-landHA:
-  url: 172.16.32.58
-  id: jboss
-  pwd: jboss  
+  url: xxx.xx.xx.xx
+  id: xxxx
+  pwd: xxxx
